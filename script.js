@@ -1,11 +1,8 @@
-"use strict";
-console.clear();
-
-const ballcode = "mb52sdi";
-const startbal = 250;
-const cutoff = 1.5;
+const dataset = "aB7$Kc8%D";
+const startbal = 350;
+const cutoff = 2.25;
 const extras = 2;
-const version = "v5.1.3"
+const version = "v6.3.3";
 const ballc = "#fc3";
 
 const width = 620;
@@ -50,11 +47,11 @@ const notes = ["C#5","C5","B5","A#5","A5","G#4","G4","F#4","F4","F#4","G4","G#4"
 let balls
 const ballsEl = document.getElementById("balls");
 
-if (localStorage.getItem(ballcode) === null) {
-    localStorage.setItem(ballcode, startbal);
+if (localStorage.getItem(dataset) === null) {
+    localStorage.setItem(dataset, startbal);
     balls = startbal;
 } else {
-    balls = parseInt(localStorage.getItem(ballcode));
+    balls = parseInt(localStorage.getItem(dataset));
 }
 
 const clickSynth = new Tone.NoiseSynth({ volume: -26 }).toDestination();
@@ -268,8 +265,8 @@ function run() {
         document.getElementById("sjasd").value = 0;
     }
 
-    localStorage.setItem(ballcode, balls);
-    ballsEl.innerHTML = parseInt(localStorage.getItem(ballcode)) + "$";
+    localStorage.setItem(dataset, balls);
+    ballsEl.innerHTML = parseInt(localStorage.getItem(dataset)) + "$";
     requestAnimationFrame(run);
 }
 
