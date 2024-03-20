@@ -203,6 +203,7 @@ button:active {
   background-color: #cf0;
   border-color: #7a0;
 }
+
 #sjasd {
   position: fixed;
   font-family: "Montserrat", sans-serif;
@@ -214,7 +215,13 @@ button:active {
   top: 6%;
   width: 64px;
   left: 85%;
+  transition: opacity 1s ease;
 }
+
+#sjasd:disabled {
+  opacity: 0.4;
+}
+
 #notf {
   position: fixed;
   top: 10%;
@@ -224,8 +231,9 @@ button:active {
   width: 256px;
   height: 64px;
   text-align: center;
-  transition: left 1.5s ease;
+  transition: left 1s ease;
 }
+
 #nott {
   position: relative;
   font-size: 14px;
@@ -259,4 +267,14 @@ button:active {
   left: 13.25%;
   top: 0.5%;
   color: rgba(255, 255, 255, 0.2);
+}
+
+#conver {
+  position: fixed;
+  left: 16.5%;
+  top: 0.6%;
+  font-size: 0.75em;
+  color: #0f3;
+  transition: color 1s ease;
+  font-weight: 900;
 }

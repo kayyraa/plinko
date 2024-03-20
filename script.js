@@ -1,12 +1,30 @@
-const dataset = "aB7$Kc8%D";
+const settings = {
+    version: "v8.2.1pa",
+    title: "Plinko"
+}
+
+const dataset = "xV1&u1ml:%";
 const startbal = 350;
-const cutoff = 2.25;
-const extras = 2;
-const version = "v6.3.3";
+const cutoff = 1.5;
+const extras = 5;
+const version = settings.version;
+const title = `${settings.title} - ${settings.version}`;
 const ballc = "#fc3";
 
-const width = 620;
-const height = 534;
+let money = localStorage.getItem(dataset);
+
+let clamp = {
+    bet: 1,
+    cur: "~",
+    diff: "?",
+    currency: "$"
+}
+
+const width = 720;
+const height = 500;
+
+const input = document.getElementById("sjasd");
+const diff = document.getElementById("conver");
 
 class Note {
     constructor(note) {
@@ -21,23 +39,23 @@ class Note {
 }
 
 const multipliers = [
-    35, 
-    25, 
-    15, 
-    10, 
-    5, 
-    3, 
-    2, 
-    0.5, 
-    0.25, 
-    0.5, 
-    2, 
-    3, 
-    5, 
-    10, 
-    15, 
-    25, 
-    35
+    5,
+    3,
+    2,
+    1.5,
+    1.25,
+    1,
+    0.75,
+    0.5,
+    0.25,
+    0.5,
+    0.75,
+    1,
+    1.25,
+    1.5,
+    2,
+    3,
+    5
 ];
 
 multipliers.forEach((m, i) => (document.getElementById(`note-${i}`).innerHTML = m));
@@ -46,6 +64,19 @@ const notes = ["C#5","C5","B5","A#5","A5","G#4","G4","F#4","F4","F#4","G4","G#4"
 
 let balls
 const ballsEl = document.getElementById("balls");
+
+const Engine = Matter.Engine, Events = Matter.Events, Render = Matter.Render, Runner = Matter.Runner, Bodies = Matter.Bodies, Composite = Matter.Composite;
+
+const engine = Engine.create({
+    gravity: {
+        scale: 0.0007
+    }
+});
+
+function areBallsLeft() {
+    const ballsInWorld = engine.world.bodies.filter(body => body.label === "Ball");
+    return ballsInWorld.length > 0;
+}
 
 if (localStorage.getItem(dataset) === null) {
     localStorage.setItem(dataset, startbal);
@@ -61,29 +92,33 @@ const autoDropCheckbox = document.getElementById("checkbox");
 let autoDropEnabled = false;
 let autoDroppingInterval = null;
 
-function notify(text, duration, level) {
+function notify(text = String, duration = Number, level = Number) {
     const bar = document.getElementById("notf");
     const title = document.getElementById("nott");
 
     title.innerHTML = text;
     bar.style.left = "3%";
 
-    if (level == 3) {
-        document.getElementById("esound").play();
-    }
+    setTimeout(() => {
+        if (level == 3) {
+            document.getElementById("esound").play();
+        }
+    }, 125);
 
     setTimeout(() => {
         bar.style.left = "-20%";
-    }, duration * 1000);
+    }, (duration * 1000) - 125);
 }
 
 dropButton.addEventListener("click", () => {
     if (autoDropEnabled && autoDroppingInterval) {
         dropButton.innerHTML = "Start";
+        input.disabled = false;
         clearInterval(autoDroppingInterval);
         autoDroppingInterval = null;
     } else if (autoDropEnabled && !autoDroppingInterval) {
         dropButton.innerHTML = "Stop";
+        input.disabled = true;
         dropABall();
         autoDroppingInterval = setInterval(dropABall, 250);
     } else if (!autoDropEnabled) {
@@ -106,12 +141,13 @@ autoDropCheckbox.addEventListener("input", (e) => {
 
 const BALL_RAD = 7;
 function dropABall() {
-    if (balls >= document.getElementById("sjasd").value * cutoff && document.getElementById("sjasd").value < 1) {
-        balls -= document.getElementById("sjasd").value * cutoff;
+    clamp.bet = input.value;
+    if (balls >= input.value * cutoff && input.value < 1) {
+        balls -= input.value * cutoff;
     }
-    if (balls >= document.getElementById("sjasd").value * cutoff) {
-        for (let i = 0; i < document.getElementById("sjasd").value; i++ && document.getElementById("sjasd").value > 1) {
-            balls -= document.getElementById("sjasd").value * cutoff;
+    if (balls >= input.value * cutoff) {
+        for (let i = 0; i < input.value; i++ && input.value > 1) {
+            balls -= input.value * cutoff;
             const dropLeft = width / 2 - GAP;
             const dropRight = width / 2 + GAP;
             const dropWidth = dropRight - dropLeft;
@@ -119,7 +155,7 @@ function dropABall() {
             const y = -PEG_RAD;
             const ball = Bodies.circle(x, y, BALL_RAD, {
                 label: "Ball",
-                restitution: 0.6,
+                restitution: 0.4,
                 render: {
                     fillStyle: ballc
                 }
@@ -134,18 +170,10 @@ function dropABall() {
         } else if (c === 1) {
             notify("Try lower numbers.", 3.15, 3);
         } else if (c === 2) {
-            notify(`You don't have ${document.getElementById("sjasd").value * cutoff}$!`, 3.15, 3);
+            notify(`You don't have at least ${input.value * cutoff}$!`, 3.15, 3);
         }
     }
 }
-
-const Engine = Matter.Engine, Events = Matter.Events, Render = Matter.Render, Runner = Matter.Runner, Bodies = Matter.Bodies, Composite = Matter.Composite;
-
-const engine = Engine.create({
-    gravity: {
-        scale: 0.0007
-    }
-});
 
 const canvas = document.getElementById("canvas");
 const render = Render.create({
@@ -209,7 +237,11 @@ Matter.Events.on(engine, "collisionStart", (event) => {
             const index = Math.floor((ballToRemove.position.x - width / 2) / GAP + 17 / 2);
             if (index >= 0 && index < 17) {
                 const ballsWon = multipliers[index];
-                balls = balls + Math.floor(ballsWon * extras);
+                if (input.value === 1) {
+                    balls = (balls + (ballsWon * extras));
+                } else {
+                    balls = balls + (clamp.bet * ballsWon);
+                }
                 if (balls < 0) {
                     balls = 0;
                 }
@@ -261,16 +293,39 @@ function run() {
         ctx.fill();
     });
     Engine.update(engine, 1000 / 60);
-    if (document.getElementById("sjasd").value < 0) {
-        document.getElementById("sjasd").value = 0;
+    if (input.value < 0) {
+        input.value = 0;
+    }
+    if (balls < 0) {
+        balls = 0;
+    }
+    if (areBallsLeft()) {
+        input.disabled = true;
+    } else {
+        input.disabled = false;
+    }
+    if (money < localStorage.getItem(dataset)) {
+        clamp.cur = "+";
+        diff.style.color = "#0f3";
+    } else {
+        clamp.cur = "-";
+        diff.style.color = "#ff5e00";
+    }
+    if (clamp.diff == "0" && clamp.cur == "-") {
+        clamp.diff = "0";
+        clamp.cur = "";
+        diff.style.color = "#0f3";
     }
 
+    clamp.diff = (money - localStorage.getItem(dataset)).toString().replace("-", "");
+    diff.innerHTML = clamp.cur + clamp.diff + clamp.currency;
     localStorage.setItem(dataset, balls);
-    ballsEl.innerHTML = parseInt(localStorage.getItem(dataset)) + "$";
+    ballsEl.innerHTML = localStorage.getItem(dataset) + clamp.currency;
     requestAnimationFrame(run);
 }
 
 document.addEventListener("DOMContentLoaded", function() {
     document.getElementById("version").innerHTML = version;
+    document.title = title;
     run();
 })
