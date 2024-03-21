@@ -1,5 +1,5 @@
 const settings = {
-    version: "v8.2.1pa",
+    version: "v9.3.1",
     title: "Plinko"
 }
 
@@ -318,7 +318,7 @@ function run() {
     }
 
     clamp.diff = (money - localStorage.getItem(dataset)).toString().replace("-", "");
-    diff.innerHTML = clamp.cur + clamp.diff + clamp.currency;
+    diff.innerHTML = "Profit: " + clamp.cur + clamp.diff + clamp.currency;
     localStorage.setItem(dataset, balls);
     ballsEl.innerHTML = localStorage.getItem(dataset) + clamp.currency;
     requestAnimationFrame(run);
