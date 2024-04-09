@@ -143,15 +143,18 @@ button:active {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 27px;
+  width: 32px;
   aspect-ratio: 30/26;
   border-radius: 5px;
   background-color: gray;
   flex-shrink: 0;
   border-bottom: solid 4px yellow;
   text-align: center;
-  font-size: 0.8em;
+  font-size: 0.7em;
   font-weight: 600;
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
 }
 .notes .note[data-pressed=true] {
   animation: press 0.5s;
@@ -213,13 +216,13 @@ button:active {
   font-weight: 900;
   color: rgba(255, 255, 255, 0.2);
   top: 6%;
-  width: 64px;
+  width: 102px;
   left: 85%;
   transition: opacity 1s ease;
 }
 
 #sjasd:disabled {
-  opacity: 0.4;
+  opacity: 0.6;
 }
 
 #notf {

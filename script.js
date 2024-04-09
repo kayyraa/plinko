@@ -1,5 +1,5 @@
 const settings = {
-    version: "v9.3.1",
+    version: "v11.2.7",
     title: "Plinko"
 }
 
@@ -17,7 +17,8 @@ let clamp = {
     bet: 1,
     cur: "~",
     diff: "?",
-    currency: "$"
+    currency: "USD",
+    curreny_location: "en-US"
 }
 
 const width = 720;
@@ -57,6 +58,12 @@ const multipliers = [
     3,
     5
 ];
+
+for (let index = 0; index < multipliers.length; index++) {
+    let element = multipliers[index];
+    element -= 0.25;
+    multipliers[index] = element;
+}
 
 multipliers.forEach((m, i) => (document.getElementById(`note-${i}`).innerHTML = m));
 
@@ -146,23 +153,21 @@ function dropABall() {
         balls -= input.value * cutoff;
     }
     if (balls >= input.value * cutoff) {
-        for (let i = 0; i < input.value; i++ && input.value > 1) {
-            balls -= input.value * cutoff;
-            const dropLeft = width / 2 - GAP;
-            const dropRight = width / 2 + GAP;
-            const dropWidth = dropRight - dropLeft;
-            const x = Math.random() * dropWidth + dropLeft;
-            const y = -PEG_RAD;
-            const ball = Bodies.circle(x, y, BALL_RAD, {
-                label: "Ball",
-                restitution: 0.4,
-                render: {
-                    fillStyle: ballc
-                }
-            });
-            clickSynth.triggerAttackRelease("32n", Tone.context.currentTime);
-            Composite.add(engine.world, [ball]);
-        }
+        balls -= input.value * cutoff;
+        const dropLeft = width / 2 - GAP;
+        const dropRight = width / 2 + GAP;
+        const dropWidth = dropRight - dropLeft;
+        const x = Math.random() * dropWidth + dropLeft;
+        const y = -PEG_RAD;
+        const ball = Bodies.circle(x, y, BALL_RAD, {
+            label: "Ball",
+            restitution: 0.4,
+            render: {
+                fillStyle: ballc
+            }
+        });
+        clickSynth.triggerAttackRelease("32n", Tone.context.currentTime);
+        Composite.add(engine.world, [ball]);
     } else {
         let c = Math.floor(Math.random() * 3);
         if (c === 0) {
@@ -307,20 +312,29 @@ function run() {
     if (money < localStorage.getItem(dataset)) {
         clamp.cur = "+";
         diff.style.color = "#0f3";
-    } else {
+    } else if (money > localStorage.getItem(dataset)) {
         clamp.cur = "-";
-        diff.style.color = "#ff5e00";
+        diff.style.color = "#fe2b01";
     }
     if (clamp.diff == "0" && clamp.cur == "-") {
         clamp.diff = "0";
         clamp.cur = "";
-        diff.style.color = "#0f3";
+        diff.style.color = "#fff";
     }
 
     clamp.diff = (money - localStorage.getItem(dataset)).toString().replace("-", "");
-    diff.innerHTML = "Profit: " + clamp.cur + clamp.diff + clamp.currency;
+    let profit_money = clamp.cur + clamp.diff;
+    let profit_format = new Intl.NumberFormat(clamp.curreny_location, {
+        style: 'currency',
+        currency: clamp.currency
+    }).format(profit_money);
+    let money_format = new Intl.NumberFormat(clamp.curreny_location, {
+        style: 'currency',
+        currency: clamp.currency
+    }).format(localStorage.getItem(dataset));
+    diff.innerHTML = "Profit: " + profit_format;
     localStorage.setItem(dataset, balls);
-    ballsEl.innerHTML = localStorage.getItem(dataset) + clamp.currency;
+    ballsEl.innerHTML = money_format;
     requestAnimationFrame(run);
 }
 
