@@ -3,7 +3,7 @@ const settings = {
     title: "Plinko"
 }
 
-const dataset = "xV1&u1ml:%";
+const dataset = "xV1&ku1ml:%";
 const startbal = 350;
 const cutoff = 1.5;
 const extras = 5;
