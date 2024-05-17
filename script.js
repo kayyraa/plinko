@@ -6,7 +6,7 @@ const settings = {
 const dataset = "xV1ka1m";
 const startbal = 500;
 const cutoff = 1.5;
-const extras = 5;
+const extras = 7.5;
 const version = settings.version;
 const title = `${settings.title} - ${settings.version}`;
 const ballc = "#fc3";
@@ -61,7 +61,7 @@ const multipliers = [
 
 for (let index = 0; index < multipliers.length; index++) {
     let element = multipliers[index];
-    element -= 0.25;
+    element += 0.5;
     multipliers[index] = element;
 }
 
